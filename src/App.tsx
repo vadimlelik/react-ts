@@ -1,26 +1,22 @@
-import { Suspense, useEffect, useState } from "react";
-import { IData } from "./types/type";
-import Component from "./components/Components";
+import { useGetPostsQuery } from "./entities/post";
+
+import Button from "./components/Button";
 
 function App() {
-  const [data, setData] = useState<IData | null>();
+  const { data, isLoading } = useGetPostsQuery();
 
-  const getData = async () => {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-    const data = await response.json();
-    setData(data);
-  };
-  console.log(data);
-
-  useEffect(() => {
-    getData();
-  }, []);
+  if (isLoading) {
+    return <h1>Loading</h1>;
+  }
 
   return (
     <>
-      <Suspense fallback={<h1>...Loading</h1>}>
-        <Component />
-      </Suspense>
+      {data?.map((post) => (
+        <div key={post.id}>
+          {post.title}
+          <Button id={post.id}>Delete</Button>
+        </div>
+      ))}
     </>
   );
 }
